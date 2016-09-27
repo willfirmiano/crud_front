@@ -2,7 +2,28 @@
  * Created by william on 01/09/16.
  */
 
-Vue.http.headers.common['Access-Control-Allow-Origin'] = 'http://localhost:8000';
+Vue.http.headers.common['Access-Control-Allow-Origin'] = '*';
+
+Vue.component('modal', {
+    template: '#modal-template',
+    props: {
+        show: {
+            type: Boolean,
+            required: true,
+            twoWay: true
+        },
+        newBook: {
+            type: Object,
+            required:true,
+            twoWay: true
+        },
+        addBook: {
+            type: Function,
+            required:true,
+            twoWay:false
+        }
+    }
+});
 
 var app = new Vue({
     el:'#app',
@@ -10,7 +31,7 @@ var app = new Vue({
         books:[],
         MySearch:'',
         orderCol: 'id',
-        orderInverse:1,
+        orderInverse:-1,
         pagination: {
             maxPage:4,
             current:1,
@@ -18,6 +39,12 @@ var app = new Vue({
             totalPages:5,
             listNumbers:[],
             listPagination:[]
+        },
+        showModal: false,
+        newBook: {
+            title:'',
+            value:'',
+            description:''
         }
     },
     methods:{
@@ -70,13 +97,30 @@ var app = new Vue({
             console.log('listPagination: ' + this.pagination.listPagination);
             this.pagination.current = current +1;
             this.books = this.pagination.listPagination[current];
+        },
+        addBook: function() {
+            this.$http.post('http://localhost:8000/api/add', this.newBook).then(function(response) {
+               console.log(response);
+                this.showModal = false;
+                location.reload();
+            }).catch(function (e) { console.log(e) });
+        },
+        removeBook: function (index) {
+            console.log(index);
+            this.$http.post('http://localhost:8000/api/remove', {id:index}).then(function(response) {
+                console.log(response);
+                alert('Registro ' + index + ' deletado com sucesso!');
+                location.reload();
+            }).catch(function (e) { console.log(e) });
         }
     },
     ready:function() {
         var self = this;
-        self.$http.get('http://127.0.0.1:8000/books').then(function(response) {
+        self.$http.get('http://127.0.0.1:8000/api/books').then(function(response) {
+        //self.$http.get('dataServer.json').then(function(response) {
             console.log(response);
 
+            //self.books = JSON.parse(response.data);
             self.books = response.data;
             //console.log(JSON.parse(response.data));
             self.pagination.totalItens = self.books.length;

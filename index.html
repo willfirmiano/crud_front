@@ -5,11 +5,27 @@
     <title>Title</title>
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
 <div class="container" id="app">
     <div class="row">
-        <h1>Books</h1>
+        <div style="margin-top: 20px">
+                <h1 style="margin: 0; display:inline-block;">Books</h1>
+                <button id="show-modal" @click="showModal = true" type="button" class="btn btn-primary pull-right">Add</button>
+        </div>
+
+        <div id="myModal">
+        <!-- use the modal component, pass in the prop -->
+            <modal :show.sync="showModal" :new-book.sync="newBook" :add-book="addBook" >
+                <!--
+                  you can use custom content here to overwrite
+                  default content
+                -->
+                <h3 slot="header">New Book</h3>
+            </modal>
+        </div>
+
         <div class="well">
             <input type="search" v-model="MySearch" class="form-control" placeholder="Search">
         </div>
@@ -45,7 +61,9 @@
                         'fa-sort-amount-asc': orderCol === 'description' && orderInverse === 1,
                         'fa-sort-amount-desc': orderCol === 'description' && orderInverse === -1,
                         }"></i>
-                        <a href="#" v-on:click="filterOrderBy($event,'description')">Description</a></th>
+                        <a href="#" v-on:click="filterOrderBy($event,'description')">Description</a>
+                    </th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -54,6 +72,9 @@
                     <td>{{ book.title | uppercase }}</td>
                     <td>{{ book.value | currency 'R$' }}</td>
                     <td>{{ book.description }}</td>
+                    <td class="remove-button">
+                        <a href="#" @click="removeBook(book.id)" class="glyphicon glyphicon-remove" aria-hidden="true"></a>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -79,6 +100,51 @@
         </nav>
 
     </div>
+
+    <!-- template for the modal component -->
+    <script type="x/template" id="modal-template">
+        <div class="mymodal-mask" v-show="show" transition="mymodal">
+            <div class="mymodal-wrapper">
+                <div class="mymodal-container">
+
+                    <div class="mymodal-header">
+                        <slot name="header">
+                            New Book
+                        </slot>
+                    </div>
+
+                    <div class="mymodal-body">
+                        <slot name="body">
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Title</label>
+                                <input v-model="newBook.title" type="text" class="form-control" placeholder="Input Title">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Value</label>
+                                <div class="input-group">
+                                    <div class="input-group-addon">$</div>
+                                    <input v-model="newBook.value" type="text" class="form-control" placeholder="00,00">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Description</label>
+                                <textarea v-model="newBook.description" class="form-control" placeholder="Description"></textarea>
+                            </div>
+                        </slot>
+                    </div>
+
+                    <div class="mymodal-footer">
+                        <slot name="footer">
+                            <div class="text-right">
+                                <button @click="addBook" type="button" class="btn btn-primary">Add</button>
+                            </div>
+                        </slot>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+
 </div>
 
 <script src="node_modules/vue/dist/vue.js"></script>
