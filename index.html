@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<div class="container" id="app">
+<div @keyup.esc="closeModal" class="container" id="app">
     <div class="row">
         <div style="margin-top: 20px">
                 <h1 style="margin: 0; display:inline-block;">Books</h1>
@@ -17,7 +17,7 @@
 
         <div id="myModal">
         <!-- use the modal component, pass in the prop -->
-            <modal :show.sync="showModal" :new-book.sync="newBook" :add-book="addBook" >
+            <modal :show.sync="showModal" :new-book.sync="newBook" :add-book="addBook" :close-modal="closeModal">
                 <!--
                   you can use custom content here to overwrite
                   default content
@@ -73,7 +73,7 @@
                     <td>{{ book.value | currency 'R$' }}</td>
                     <td>{{ book.description }}</td>
                     <td class="remove-button">
-                        <a href="#" @click="removeBook(book.id)" class="glyphicon glyphicon-remove" aria-hidden="true"></a>
+                        <a href="#" @click="removeBook($event, book.id)" class="glyphicon glyphicon-remove" aria-hidden="true"></a>
                     </td>
                 </tr>
             </tbody>
@@ -108,6 +108,9 @@
                 <div class="mymodal-container">
 
                     <div class="mymodal-header">
+                        <button @click="closeModal" type="button" class="close" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                         <slot name="header">
                             New Book
                         </slot>
@@ -117,7 +120,7 @@
                         <slot name="body">
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Title</label>
-                                <input v-model="newBook.title" type="text" class="form-control" placeholder="Input Title">
+                                <input v-el:teste v-model="newBook.title" type="text" class="form-control" placeholder="Input Title">
                             </div>
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Value</label>

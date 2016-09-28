@@ -21,7 +21,20 @@ Vue.component('modal', {
             type: Function,
             required:true,
             twoWay:false
+        },
+        closeModal: {
+            type: Function,
+            required:true,
+            twoWay:false
         }
+    },
+    watch: {
+        show: function (value) {
+            console.log(value);
+            if (value) {
+                this.$els.teste.focus();
+            }
+        },
     }
 });
 
@@ -100,19 +113,33 @@ var app = new Vue({
         },
         addBook: function() {
             this.$http.post('http://localhost:8000/api/add', this.newBook).then(function(response) {
-               console.log(response);
-                this.showModal = false;
-                location.reload();
+                if(response.data.status === 'success') {
+                    this.showModal = false;
+                    location.reload();
+                }
             }).catch(function (e) { console.log(e) });
         },
-        removeBook: function (index) {
+        removeBook: function (e, index) {
+            e.preventDefault();
             console.log(index);
             this.$http.post('http://localhost:8000/api/remove', {id:index}).then(function(response) {
                 console.log(response);
                 alert('Registro ' + index + ' deletado com sucesso!');
                 location.reload();
             }).catch(function (e) { console.log(e) });
+        },
+        closeModal: function () {
+            if(this.showModal === true) {
+                this.showModal = false;
+            }
         }
+    },
+    watch: {
+        showModal: function (value) {
+            if(value) {
+                console.log('mudou');
+            }
+        },
     },
     ready:function() {
         var self = this;
